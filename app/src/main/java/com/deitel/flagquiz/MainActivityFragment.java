@@ -48,6 +48,8 @@ public class MainActivityFragment extends Fragment {
    private int totalGuesses; // number of guesses made
    private int correctAnswers; // number of correct guesses
    private int guessRows; // number of rows displaying guess Buttons
+   private int firstCorrectAnswers; //number of answers that were correctly guessed the first time
+   private Boolean hasBeenIncorrect;
    private SecureRandom random; // used to randomize the quiz
    private Handler handler; // used to delay loading next flag
    private Animation shakeAnimation; // animation for incorrect guess
@@ -151,6 +153,7 @@ public class MainActivityFragment extends Fragment {
 
       correctAnswers = 0; // reset the number of correct answers made
       totalGuesses = 0; // reset the total number of guesses the user made
+      firstCorrectAnswers = 0; //reset the number of guesses that were correct the first time
       quizCountriesList.clear(); // clear prior list of quiz countries
 
       int flagCounter = 1;
@@ -293,7 +296,10 @@ public class MainActivityFragment extends Fragment {
 
          if (guess.equals(answer)) { // if the guess is correct
             ++correctAnswers; // increment the number of correct answers
-
+            if(hasBeenIncorrect == false){
+               firstCorrectAnswers++;
+            }
+            hasBeenIncorrect = false;
             // display correct answer in green text
             answerTextView.setText(answer + "!");
             answerTextView.setTextColor(
@@ -315,7 +321,7 @@ public class MainActivityFragment extends Fragment {
                         builder.setMessage(
                            getString(R.string.results,
                               totalGuesses,
-                              (1000 / (double) totalGuesses)));
+                              (1000 / (double) totalGuesses), firstCorrectAnswers));
 
                         // "Reset Quiz" Button
                         builder.setPositiveButton(R.string.reset_quiz,
@@ -348,7 +354,7 @@ public class MainActivityFragment extends Fragment {
          }
          else { // answer was incorrect
             flagImageView.startAnimation(shakeAnimation); // play shake
-
+            hasBeenIncorrect = true;
             // display "Incorrect!" in red
             answerTextView.setText(R.string.incorrect_answer);
             answerTextView.setTextColor(getResources().getColor(
